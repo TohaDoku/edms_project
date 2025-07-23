@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h4>Список маршрутов обработки документов</h4>
+    <table class="table table-bordered table-hover mt-4">
+        <thead class="table-light">
+            <tr>
+                <th>Документ</th>
+                <th>Исполнитель</th>
+                <th>Статус</th>
+                <th>Срок</th>
+                <th>Комментарий</th>
+                <th>Обновлено</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for route in routes %}
+                <tr>
+                    <td>
+                        <a href="#">
+                            №{{ route.document.number }}
+                        </a>
+                        <br>
+                        {{ route.document.title }}
+                    </td>
+                    <td>{{ route.assigned_to.get_full_name|default:route.assigned_to.username }}</td>
+                    <td>{{ route.get_status_display }}</td>
+                    <td>{{ route.due_date|date:"d.m.Y" }}</td>
+                    <td>{{ route.comment|truncatewords:10 }}</td>
+                    <td>{{ route.updated_at|date:"d.m.Y H:i" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6">Маршрутов пока нет.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if is_paginated %}
+        <nav>
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a>
+                    </li>
+                {% endif %}
+                <li class="page-item disabled">
+                    <span class="page-link">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+                </li>
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперёд</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+{% endblock %}

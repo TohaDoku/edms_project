@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="alert alert-success">
+        Исходящий документ успешно создан и отправлен на согласование!
+    </div>
+    <a href="{% url 'create_outgoing' %}" class="btn btn-primary">Создать ещё</a>
+</div>
+{% endblock %}

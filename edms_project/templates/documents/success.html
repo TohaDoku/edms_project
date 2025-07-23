@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="alert alert-success">
+        Документ успешно зарегистрирован!
+    </div>
+    <a href="{% url 'incoming_add' %}" class="btn btn-primary">Добавить ещё</a>
+</div>
+{% endblock %}
