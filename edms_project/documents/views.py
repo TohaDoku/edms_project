@@ -103,10 +103,24 @@ def document_archive(request):
 
     # Добавляем тип и объединяем
     archive = [
-        {"type": "Входящий", "number": d.number, "title": d.title, "date": d.received_date, "status": "—", "link": f"/documents/incoming/{d.id}/"}
+        {
+            "type": "Входящий",
+            "number": d.number,
+            "title": d.title,
+            "date": d.received_date,  # datetime.date
+            "status": "—",
+            "link": f"/documents/incoming/{d.id}/"
+        }
         for d in incoming
     ] + [
-        {"type": "Исходящий", "number": d.number, "title": d.title, "date": d.created_at, "status": d.get_status_display(), "link": f"/documents/outgoing/{d.id}/"}
+        {
+            "type": "Исходящий",
+            "number": d.number,
+            "title": d.title,
+            "date": d.created_at.date(),  # <--- ПРИВОДИМ к datetime.date
+            "status": d.get_status_display(),
+            "link": f"/documents/outgoing/{d.id}/"
+        }
         for d in outgoing
     ]
 

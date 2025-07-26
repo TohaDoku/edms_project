@@ -3,7 +3,7 @@ from django.views.generic import ListView
 from django.contrib.auth.decorators import user_passes_test
 from django.utils.decorators import method_decorator
 from .models import LoginLog
-
+from django.shortcuts import render
 
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -44,3 +44,8 @@ class LoginLogListView(ListView):
     context_object_name = 'logs'
     ordering = ['-timestamp']
     paginate_by = 30
+
+
+def dashboard(request):
+
+    return render(request, 'users/dashboard.html')
