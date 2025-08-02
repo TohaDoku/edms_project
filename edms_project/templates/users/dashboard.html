@@ -1,7 +1,44 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mt-5">
-    <h3>Главная страница личного кабинета</h3>
-    
+<div class="container py-5">
+  <h2>Общая статистика</h2>
+  <div class="row row-cols-1 row-cols-md-2 g-4 mb-5">
+    <div class="col">
+      <div class="card text-white bg-primary">
+        <div class="card-body">
+          <h5>Всего поручений</h5>
+          <p class="fs-4">{{ total_tasks }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card text-white bg-danger">
+        <div class="card-body">
+          <h5>Скоро дедлайн</h5>
+          <p class="fs-4">{{ urgent_tasks }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Документы на согласовании</h3>
+  <div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="col">
+      <div class="card bg-warning-subtle">
+        <div class="card-body">
+          <h6>Ожидают согласования</h6>
+          <p class="fs-5">{{ documents_pending }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card bg-secondary-subtle">
+        <div class="card-body">
+          <h6>Возвращены на доработку</h6>
+          <p class="fs-5">{{ documents_returned }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Согласование документа</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="mb-3">{{ document.title }}</h6>
+                    {% if document.description %}
+                        <p class="text-muted">{{ document.description }}</p>
+                    {% endif %}
+                    <p><strong>Файл:</strong> <a href="{{ document.file.url }}" target="_blank">{{ document.file.name }}</a></p>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Статус</label>
+                            {{ form.status }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Комментарий</label>
+                            {{ form.reviewer_comment }}
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success">Сохранить решение</button>
+                            <a href="{% url 'documents_for_review' %}" class="btn btn-outline-secondary">Назад</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container py-5">
+    <h2 class="mb-4">Документы на согласование</h2>
+
+    {% if documents %}
+        <div class="row row-cols-1 g-4">
+            {% for doc in documents %}
+                <div class="col">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ doc.title }}</h5>
+                            {% if doc.description %}
+                                <p class="card-text text-muted">{{ doc.description }}</p>
+                            {% endif %}
+                            <p class="mb-2"><strong>Файл:</strong> <a href="{{ doc.file.url }}" target="_blank">{{ doc.file.name }}</a></p>
+                            <a href="{% url 'review_document' doc.id %}" class="btn btn-sm btn-primary">Открыть для согласования</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">Нет документов, ожидающих согласования.</div>
+    {% endif %}
+</div>
+{% endblock %}

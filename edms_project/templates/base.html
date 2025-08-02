@@ -29,6 +29,21 @@
             <li><a class="dropdown-item" href="{% url 'document_archive' %}">Архив</a></li>
           </ul>
         </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Поручения</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'create_task' %}">Создать поручение</a></li>
+            <li><a class="dropdown-item" href="{% url 'task_list' %}">Активные поручения</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Согласование</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'create_document' %}">Добавить документ</a></li>
+            <li><a class="dropdown-item" href="{% url 'documents_for_review' %}">Документы на согласование</a></li>
+            <li><a class="dropdown-item" href="{% url 'archive' %}">Архив документов</a></li>
+          </ul>
+        </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'login_journal' %}">Журнал входов</a>
         </li>
