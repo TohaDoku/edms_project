@@ -2,27 +2,60 @@
 {% block content %}
 
 <div class="container py-5">
+    {% if request.user.groups.all.0.name == 'Сотрудник' %}
+    <h2 class="mb-4">Документы на доработке</h2>
+    {% else %}
     <h2 class="mb-4">Документы на согласование</h2>
+    {% endif %}
 
     {% if documents %}
-        <div class="row row-cols-1 g-4">
-            {% for doc in documents %}
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ doc.title }}</h5>
-                            {% if doc.description %}
-                                <p class="card-text text-muted">{{ doc.description }}</p>
-                            {% endif %}
-                            <p class="mb-2"><strong>Файл:</strong> <a href="{{ doc.file.url }}" target="_blank">{{ doc.file.name }}</a></p>
-                            <a href="{% url 'review_document' doc.id %}" class="btn btn-sm btn-primary">Открыть для согласования</a>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>№</th>
+                        <th>Краткое содержание</th>
+                        <th>Тип</th>
+                        <th>Файл</th>
+                        <th>Статус</th>
+                        <th>Комментарий</th>
+                        <th>Адресат/Автор</th>
+                        <th>Согласующий</th>
+                        <th>Создан</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documents %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ doc.title }}</td>
+                            <td>{{ doc.type_choices }}</td>
+                            <td>
+                                {% if doc.file %}
+                                    <a href="{{ doc.file.url }}" target="_blank">{{ doc.file.name|truncatechars:30 }}</a>
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>{{ doc.get_status_display }}</td>
+                            <td>{{ doc.reviewer_comment|default:"—" }}</td>
+                            <td>{{ doc.creator.get_full_name|default:doc.creator.username }}</td>
+                            <td>{{ doc.executor.get_full_name|default:doc.executor.username }}</td>
+                            <td>{{ doc.created_at|date:"d.m.Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'review_document' doc.id %}" class="btn btn-sm btn-primary">
+                                    Открыть
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     {% else %}
         <div class="alert alert-info">Нет документов, ожидающих согласования.</div>
     {% endif %}
 </div>
+
 {% endblock %}

@@ -1,5 +1,6 @@
 from django import forms
 from .models import *
+from django.contrib.auth.models import User, Group
 
 class TaskForm(forms.ModelForm):
     class Meta:
@@ -41,10 +42,30 @@ class DocumentReviewForm(forms.ModelForm):
 class DocumentCreateForm(forms.ModelForm):
     class Meta:
         model = Document
-        fields = ['title', 'description', 'file', 'department']
+        fields = ['title', 'type_choices', 'executor', 'file']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'type_choices': forms.Select(attrs={'class': 'form-select'}),
             'file': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'department': forms.Select(attrs={'class': 'form-select'}),
+            'executor': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Фильтрация пользователей по группам
+        self.fields['executor'].queryset = User.objects.filter(
+            groups__name__in=['Администратор', 'Руководитель']
+        ).distinct()
+
+        # Отображение Фамилия Имя вместо username
+        self.fields['executor'].label_from_instance = lambda obj: f"{obj.last_name} {obj.first_name}".strip() or obj.username
+
+
+class DocumentFileUploadForm(forms.ModelForm):
+    class Meta:
+        model = Document
+        fields = ['file']  # только поле для файла
+        widgets = {
+            'file': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }

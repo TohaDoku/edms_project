@@ -16,4 +16,9 @@ urlpatterns = [
     path('review/<int:doc_id>/', review_document, name='review_document'),
     path('archive/', archive_view, name='archive'),
     path('create/', create_document, name='create_document'),
+    path('document/<int:document_id>/', document_detail, name='document_detail'),
+
+    path('staff_structure_view/', staff_structure_view, name='staff_structure_view'),
+
+    path('documents_for_update/', documents_for_update, name='documents_for_update'),
 ]

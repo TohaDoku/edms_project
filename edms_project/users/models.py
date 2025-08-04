@@ -22,6 +22,7 @@ class LoginLog(models.Model):
 
 class Department(models.Model):
     name = models.CharField(max_length=255)
+    users = models.ManyToManyField(User, blank=True, related_name='departments')
 
     def __str__(self):
         return self.name
@@ -47,13 +48,37 @@ class Document(models.Model):
         ('на доработке', 'На доработке'),
     ]
 
-    title = models.CharField(max_length=255)
+    TYPE_CHOICES = [
+        ('Исходящий', 'Исходящий'),
+        ('Входящий', 'Входящий'),
+    ]
+
+    title = models.CharField("Краткое содержание", max_length=255)
+    type_choices = models.CharField("Тип документа", max_length=20, choices=TYPE_CHOICES, blank=True, null=True)
     description = models.TextField("Краткое описание", blank=True)
-    file = models.FileField(upload_to='documents/')
-    department = models.ForeignKey('Department', on_delete=models.CASCADE)
+    file = models.FileField("Файл", upload_to='documents/')
+    department = models.ForeignKey('Department', on_delete=models.CASCADE, blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='на согласовании')
     reviewer_comment = models.TextField("Комментарий руководителя", blank=True)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="doc_creators", blank=True, null=True)
+    executor = models.ForeignKey(User, verbose_name="Кто будет согласовывать?", on_delete=models.CASCADE, related_name="doc_executors", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
+
+
+class DocumentActionLog(models.Model):
+    ACTION_CHOICES = [
+        ('отправлен на согласование', 'Отправлен на согласование'),
+        ('отправлен на доработку', 'Отправлен на доработку'),
+        ('повторно отправлен', 'Повторно отправлен'),
+    ]
+
+    document = models.ForeignKey('Document', on_delete=models.CASCADE, related_name='action_logs')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    action = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.document.title} — {self.action} от {self.user.get_full_name() or self.user.username}"

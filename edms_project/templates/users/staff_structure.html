@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-5">
+  <h2 class="mb-4">Штатная структура</h2>
+  <div class="card mb-4">
+    <div class="card-body">
+      {% if users_without_department %}
+        <ul class="list-group list-group-flush">
+          {% for user in users_without_department %}
+            <li class="list-group-item">
+              {{ user.get_full_name|default:user.username }}
+              •
+              {{ user.groups.first.name|default:"Без группы" }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted mb-0">Все пользователи закреплены за отделами</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <h2 class="mb-3">Структура по отделам</h2>
+  <div class="accordion" id="departmentAccordion">
+    {% for department in departments %}
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+            data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false"
+            aria-controls="collapse{{ forloop.counter }}">
+            {{ department.name }}
+          </button>
+        </h2>
+        <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse"
+          aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#departmentAccordion">
+          <div class="accordion-body p-0">
+            {% if department.users.all %}
+              <ul class="list-group list-group-flush">
+                {% for user in department.users.all %}
+                  <li class="list-group-item">
+                    {{ user.get_full_name|default:user.username }}
+                    •
+                    {{ user.groups.first.name|default:"Без группы" }}
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <div class="p-3 text-muted">Нет сотрудников в этом отделе</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

@@ -1,20 +1,47 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container py-4">
-  <h2>Архив документов</h2>
-  <div class="row row-cols-1 g-3">
-    {% for doc in documents %}
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <h5>{{ doc.title }}</h5>
-            <p class="text-muted">{{ doc.description }}</p>
-            <a href="{{ doc.file.url }}" class="btn btn-sm btn-outline-primary">Скачать</a>
-            <span class="badge bg-secondary float-end">{{ doc.get_status_display }}</span>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
+  <h2 class="mb-4">Архив документов</h2>
+
+  {% if documents %}
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>№</th>
+            <th>Краткое содержание</th>
+            <th>Описание</th>
+            <th>Файл</th>
+            <th>Статус</th>
+            <th>Дата</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for doc in documents %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ doc.title }}</td>
+              <td>{{ doc.description|default:"—" }}</td>
+              <td>
+                {% if doc.file %}
+                  <a href="{{ doc.file.url }}" target="_blank">Скачать</a>
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td><span class="badge bg-secondary">{{ doc.get_status_display }}</span></td>
+              <td>{{ doc.created_at|date:"d.m.Y H:i" }}</td>
+              <td>
+                <a href="{% url 'document_detail' doc.id %}" class="btn btn-sm btn-primary">Открыть</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info">Документы в архиве отсутствуют.</div>
+  {% endif %}
 </div>
 {% endblock %}
