@@ -7,7 +7,6 @@
     </div>
     <div class="card-body">
       <p><strong>Тип документа:</strong> {{ doc.type_choices|default:"—" }}</p>
-      <p><strong>Описание:</strong> {{ doc.description|default:"—" }}</p>
       <p><strong>Статус:</strong> <span class="badge bg-secondary">{{ doc.get_status_display }}</span></p>
       <p><strong>Комментарий:</strong> {{ doc.reviewer_comment|default:"—" }}</p>
       <p><strong>Создатель:</strong> {{ doc.creator.get_full_name|default:doc.creator.username }}</p>
@@ -15,7 +14,7 @@
       <p><strong>Дата создания:</strong> {{ doc.created_at|date:"d.m.Y H:i" }}</p>
 
       {% if doc.file %}
-        <p><strong>Файл:</strong> <a href="{{ doc.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">Скачать</a></p>
+        <p><strong>Файл:</strong> <a href="{{ doc.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank" download>Скачать</a></p>
       {% endif %}
 
     <hr>

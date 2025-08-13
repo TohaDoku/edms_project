@@ -51,6 +51,7 @@ class Document(models.Model):
     TYPE_CHOICES = [
         ('Исходящий', 'Исходящий'),
         ('Входящий', 'Входящий'),
+        ('Внутренний', 'Внутренний'),
     ]
 
     title = models.CharField("Краткое содержание", max_length=255)

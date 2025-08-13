@@ -5,7 +5,7 @@ from django.contrib.auth.models import User, Group
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['title', 'description', 'executor', 'department', 'deadline']
+        fields = ['title', 'description', 'executor', 'deadline']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -17,9 +17,6 @@ class TaskForm(forms.ModelForm):
                 'rows': 4
             }),
             'executor': forms.Select(attrs={
-                'class': 'form-select'
-            }),
-            'department': forms.Select(attrs={
                 'class': 'form-select'
             }),
             'deadline': forms.DateTimeInput(attrs={

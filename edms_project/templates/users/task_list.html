@@ -18,11 +18,19 @@
                             <h6 class="card-subtitle mb-2 text-muted">
                                 Дедлайн: {{ task.deadline|date:"d.m.Y H:i" }}
                             </h6>
+                            <h6>Кто выполняет: {{ task.executor }}</h6>
                             <p class="card-text">{{ task.description }}</p>
+                        
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-outline-primary">✏ Изменить</a>
+                                <a href="{% url 'complete_task' task.id %}" class="btn btn-sm btn-success"
+                                   onclick="return confirm('Отметить как выполненное?')">✔ Выполнено</a>
+                            </div>
                         </div>
                     </div>
                 </div>
                 {% endfor %}
+
             </div>
         {% else %}
             <div class="alert alert-info">Нет активных поручений</div>

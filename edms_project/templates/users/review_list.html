@@ -18,7 +18,6 @@
                         <th>Тип</th>
                         <th>Файл</th>
                         <th>Статус</th>
-                        <th>Комментарий</th>
                         <th>Адресат/Автор</th>
                         <th>Согласующий</th>
                         <th>Создан</th>
@@ -33,13 +32,12 @@
                             <td>{{ doc.type_choices }}</td>
                             <td>
                                 {% if doc.file %}
-                                    <a href="{{ doc.file.url }}" target="_blank">{{ doc.file.name|truncatechars:30 }}</a>
+                                    <a href="{{ doc.file.url }}" target="_blank" download>{{ doc.file.name|truncatechars:30 }}</a>
                                 {% else %}
                                     —
                                 {% endif %}
                             </td>
                             <td>{{ doc.get_status_display }}</td>
-                            <td>{{ doc.reviewer_comment|default:"—" }}</td>
                             <td>{{ doc.creator.get_full_name|default:doc.creator.username }}</td>
                             <td>{{ doc.executor.get_full_name|default:doc.executor.username }}</td>
                             <td>{{ doc.created_at|date:"d.m.Y H:i" }}</td>

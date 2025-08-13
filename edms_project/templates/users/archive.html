@@ -10,7 +10,7 @@
           <tr>
             <th>№</th>
             <th>Краткое содержание</th>
-            <th>Описание</th>
+            
             <th>Файл</th>
             <th>Статус</th>
             <th>Дата</th>
@@ -22,10 +22,9 @@
             <tr>
               <td>{{ forloop.counter }}</td>
               <td>{{ doc.title }}</td>
-              <td>{{ doc.description|default:"—" }}</td>
               <td>
                 {% if doc.file %}
-                  <a href="{{ doc.file.url }}" target="_blank">Скачать</a>
+                  <a href="{{ doc.file.url }}" target="_blank" download>Скачать</a>
                 {% else %}
                   —
                 {% endif %}

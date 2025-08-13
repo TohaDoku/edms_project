@@ -2,6 +2,80 @@
 {% block content %}
 <div class="container py-5">
   <h2 class="mb-4">Документ: {{ document.title }}</h2>
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">{{ document.title }}</h5>
+    </div>
+    <div class="card-body">
+      <p><strong>Тип документа:</strong> {{ document.type_choices|default:"—" }}</p>
+      <p><strong>Статус:</strong> <span class="badge bg-secondary">{{ document.get_status_display }}</span></p>
+      <p><strong>Комментарий:</strong> {{ document.reviewer_comment|default:"—" }}</p>
+      <p><strong>Создатель:</strong> {{ document.creator.get_full_name|default:document.creator.username }}</p>
+      <p><strong>Согласующий:</strong> {{ document.executor.get_full_name|default:document.executor.username }}</p>
+      <p><strong>Дата создания:</strong> {{ document.created_at|date:"d.m.Y H:i" }}</p>
+
+      {% if document.file %}
+        <p><strong>Файл:</strong> <a href="{{ doc.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank" download>Скачать</a></p>
+      {% endif %}
+
+    <hr>
+    <h4>История маршрута документа</h4>
+    {% if document.action_logs.all %}
+      <ul class="list-group">
+        {% for log in document.action_logs.all %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <strong>{{ log.user.get_full_name|default:log.user.username }}</strong>
+              — {{ log.get_action_display }}
+            </div>
+            <small class="text-muted">{{ log.timestamp|date:"d.m.Y H:i" }}</small>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">История действий отсутствует.</p>
+    {% endif %}
+
+    </div>
+    <div class="card-footer text-end">
+  <!-- Кнопка для открытия модалки -->
+  <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#changeExecutorModal">
+    Передать на согласование другому руководителю
+  </button>
+</div>
+
+<!-- Модальное окно -->
+<div class="modal fade" id="changeExecutorModal" tabindex="-1" aria-labelledby="changeExecutorModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'change_document_executor' document.id %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="changeExecutorModalLabel">Выбрать нового согласующего</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="executor" class="form-label">Согласующий</label>
+            <select name="executor" id="executor" class="form-select" required>
+              {% for user in leaders %}
+                  <option value="{{ user.id }}" {% if document.executor.id == user.id %}selected{% endif %}>
+                      {{ user.get_full_name|default:user.username }}
+                  </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+  </div>
+
   <div class="card">
     <div class="card-body">
       <form method="post" enctype="multipart/form-data">

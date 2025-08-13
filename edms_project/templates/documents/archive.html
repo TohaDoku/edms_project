@@ -40,7 +40,7 @@
         {% for doc in documents %}
             <tr>
                 <td>{{ doc.type }}</td>
-                <td><a href="{{ doc.link }}">{{ doc.number }}</a></td>
+                <td><a href="{{ doc.link }}" target="_blank" download>{{ doc.number }}</a></td>
                 <td>{{ doc.title }}</td>
                 <td>{{ doc.date|date:"d.m.Y" }}</td>
                 <td>{{ doc.status }}</td>

@@ -54,22 +54,28 @@ class LoginLogListView(ListView):
 @login_required
 def dashboard(request):
     user = request.user
-    now = timezone.now()
+    now = timezone.now().date()
     start_of_week = now - timedelta(days=now.weekday())
     end_of_week = start_of_week + timedelta(days=6)
 
     # Мои поручения (я исполнитель)
-    my_tasks = Task.objects.filter(executor=user)
-    my_tasks_1_3 = my_tasks.filter(deadline__lte=now + timedelta(days=3), is_completed=False).count()
-    my_tasks_week = my_tasks.filter(deadline__gt=now + timedelta(days=3), deadline__lte=end_of_week, is_completed=False).count()
-    my_tasks_late = my_tasks.filter(deadline__gt=end_of_week, is_completed=False).count()
+    my_tasks = Task.objects.filter(executor=user, is_completed=False)
+
+    my_tasks_today = my_tasks.filter(deadline=now).count()
+    my_tasks_1_3 = my_tasks.filter(deadline__gt=now, deadline__lte=now + timedelta(days=3)).count()
+    my_tasks_week = my_tasks.filter(deadline__gt=now + timedelta(days=3), deadline__lte=end_of_week).count()
+    my_tasks_late = my_tasks.filter(deadline__gt=end_of_week).count()
+    my_tasks_overdue = my_tasks.filter(deadline__lt=now).count()
     my_tasks_total = my_tasks.count()
 
-    # Назначенные поручения (я руководитель, т.е. я создал поручения)
-    assigned_tasks = Task.objects.filter(creator=user)
-    assigned_1_3 = assigned_tasks.filter(deadline__lte=now + timedelta(days=3), is_completed=False).count()
-    assigned_week = assigned_tasks.filter(deadline__gt=now + timedelta(days=3), deadline__lte=end_of_week, is_completed=False).count()
-    assigned_late = assigned_tasks.filter(deadline__gt=end_of_week, is_completed=False).count()
+    # Назначенные поручения (я руководитель)
+    assigned_tasks = Task.objects.filter(creator=user, is_completed=False)
+
+    assigned_today = assigned_tasks.filter(deadline=now).count()
+    assigned_1_3 = assigned_tasks.filter(deadline__gt=now, deadline__lte=now + timedelta(days=3)).count()
+    assigned_week = assigned_tasks.filter(deadline__gt=now + timedelta(days=3), deadline__lte=end_of_week).count()
+    assigned_late = assigned_tasks.filter(deadline__gt=end_of_week).count()
+    assigned_overdue = assigned_tasks.filter(deadline__lt=now).count()
     assigned_total = assigned_tasks.count()
 
     # Документы
@@ -78,16 +84,21 @@ def dashboard(request):
     documents_incoming = Document.objects.filter(executor=user, status='на согласовании').count()
 
     context = {
+        'user_display': f"{user.last_name} {user.first_name[0]}.",
         'my_tasks': {
+            'today': my_tasks_today,
             '1_3': my_tasks_1_3,
             'week': my_tasks_week,
             'late': my_tasks_late,
+            'overdue': my_tasks_overdue,
             'total': my_tasks_total,
         },
         'assigned_tasks': {
+            'today': assigned_today,
             '1_3': assigned_1_3,
             'week': assigned_week,
             'late': assigned_late,
+            'overdue': assigned_overdue,
             'total': assigned_total,
         },
         'documents_pending': documents_pending,
@@ -97,7 +108,6 @@ def dashboard(request):
     }
 
     return render(request, 'users/dashboard.html', context)
-
 
 @login_required
 def create_task(request):
@@ -129,7 +139,7 @@ def documents_for_review(request):
 @login_required
 def review_document(request, doc_id):
     document = get_object_or_404(Document, pk=doc_id)
-
+    leaders = User.objects.filter(groups__name__in=["Руководитель", "Администратор"]).order_by('last_name', 'first_name')
     # Получаем список групп пользователя
     user_groups = request.user.groups.values_list('name', flat=True)
     is_employee = 'Сотрудник' in user_groups
@@ -175,13 +185,14 @@ def review_document(request, doc_id):
     return render(request, 'users/review_form.html', {
         'form': form,
         'document': document,
-        'is_employee': is_employee
+        'is_employee': is_employee,
+        'leaders': leaders
     })
 
 
 @login_required
 def archive_view(request):
-    documents = Document.objects.exclude(status='на согласовании').order_by('-created_at')
+    documents = Document.objects.exclude(status__in=['на согласовании', 'на доработке']).order_by('-created_at')
     return render(request, 'users/archive.html', {'documents': documents})
 
 
@@ -221,3 +232,55 @@ def staff_structure_view(request):
 def documents_for_update(request):
     documents = Document.objects.filter(creator=request.user, status='на доработке')
     return render(request, 'users/review_list.html', {'documents': documents})
+
+
+@login_required
+def change_document_executor(request, document_id):
+    document = get_object_or_404(Document, id=document_id)
+
+    # Проверка прав — например, только создатель документа или админ
+    if request.user != document.creator and not request.user.is_superuser:
+        return redirect('document_detail', document_id=document.id)
+
+    if request.method == "POST":
+        new_executor_id = request.POST.get("executor")
+        if new_executor_id:
+            new_executor = get_object_or_404(User, id=new_executor_id)
+            document.executor = new_executor
+            document.save()
+
+            # Логируем действие
+            DocumentActionLog.objects.create(
+                document=document,
+                user=request.user,
+                action=f'Согласующий изменён на {new_executor.get_full_name() or new_executor.username}'
+            )
+
+    return redirect('review_document', document_id=document.id)
+
+
+@login_required
+def complete_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id, executor=request.user)
+    task.is_completed = True
+    task.save()
+    return redirect('task_list')
+
+
+@login_required
+def edit_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+
+    # Проверка прав — только исполнитель или создатель
+    if task.executor != request.user and task.creator != request.user:
+        return redirect('task_list')
+
+    if request.method == 'POST':
+        form = TaskForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            return redirect('task_list')
+    else:
+        form = TaskForm(instance=task)
+
+    return render(request, 'users/edit_task.html', {'form': form, 'task': task})
