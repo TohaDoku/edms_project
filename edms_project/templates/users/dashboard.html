@@ -73,12 +73,4 @@
   {% endif %}
 </div>
 
-{% if is_leader %}
-<hr class="my-5">
-<h4>Администрирование</h4>
-<ul class="mb-0">
-  <li><a href="{% url 'staff_structure' %}">Штатная структура</a></li>
-  <li><a href="{% url 'login_journal' %}">Журнал входов</a></li>
-</ul>
-{% endif %}
 {% endblock %}

@@ -79,6 +79,7 @@
             </ul>
           </li>
 
+          {% if not request.user.groups.all.0.name == 'Сотрудник' %}
           <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'login_journal' %}active{% endif %}" href="{% url 'login_journal' %}">Журнал входов</a>
           </li>
@@ -86,6 +87,7 @@
           <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name in 'staff_structure_view staff_structure' %}active{% endif %}" href="{% url 'staff_structure_view' %}">Штатная структура</a>
           </li>
+          {% endif %}
         {% endif %}
       </ul>
 
