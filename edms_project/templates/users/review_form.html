@@ -1,47 +1,44 @@
 {% extends 'base.html' %}
+{% block title %}Согласование документа — ЭДО{% endblock %}
 {% block content %}
-<div class="container py-5">
-  <h2 class="mb-4">Документ: {{ document.title }}</h2>
-  <div class="card shadow">
-    <div class="card-header bg-primary text-white">
-      <h5 class="mb-0">{{ document.title }}</h5>
-    </div>
-    <div class="card-body">
-      <p><strong>Тип документа:</strong> {{ document.type_choices|default:"—" }}</p>
-      <p><strong>Статус:</strong> <span class="badge bg-secondary">{{ document.get_status_display }}</span></p>
-      <p><strong>Комментарий:</strong> {{ document.reviewer_comment|default:"—" }}</p>
-      <p><strong>Создатель:</strong> {{ document.creator.get_full_name|default:document.creator.username }}</p>
-      <p><strong>Согласующий:</strong> {{ document.executor.get_full_name|default:document.executor.username }}</p>
-      <p><strong>Дата создания:</strong> {{ document.created_at|date:"d.m.Y H:i" }}</p>
+<h2 class="mb-4">Документ: {{ document.title }}</h2>
 
+<div class="card mb-4">
+  <div class="card-header bg-primary text-white"><h5 class="mb-0">{{ document.title }}</h5></div>
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-6"><strong>Тип документа:</strong> {{ document.type_choices|default:"—" }}</div>
+      <div class="col-md-6"><strong>Статус:</strong> <span class="badge bg-secondary">{{ document.get_status_display }}</span></div>
+      <div class="col-md-6"><strong>Создатель:</strong> {{ document.creator.get_full_name|default:document.creator.username }}</div>
+      <div class="col-md-6"><strong>Согласующий:</strong> {{ document.executor.get_full_name|default:document.executor.username }}</div>
+      <div class="col-md-6"><strong>Дата создания:</strong> {{ document.created_at|date:"d.m.Y H:i" }}</div>
+      <div class="col-md-12"><strong>Комментарий:</strong> {{ document.reviewer_comment|default:"—" }}</div>
       {% if document.file %}
-        <p><strong>Файл:</strong> <a href="{{ doc.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank" download>Скачать</a></p>
+      <div class="col-md-12">
+        <strong>Файл:</strong> <a href="{{ document.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank" download>Скачать</a>
+      </div>
       {% endif %}
+    </div>
 
     <hr>
-    <h4>История маршрута документа</h4>
+    <h5 class="mb-3">История маршрута документа</h5>
     {% if document.action_logs.all %}
       <ul class="list-group">
         {% for log in document.action_logs.all %}
           <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <strong>{{ log.user.get_full_name|default:log.user.username }}</strong>
-              — {{ log.get_action_display }}
-            </div>
+            <div><strong>{{ log.user.get_full_name|default:log.user.username }}</strong> — {{ log.get_action_display }}</div>
             <small class="text-muted">{{ log.timestamp|date:"d.m.Y H:i" }}</small>
           </li>
         {% endfor %}
       </ul>
     {% else %}
-      <p class="text-muted">История действий отсутствует.</p>
+      <p class="text-muted mb-0">История действий отсутствует.</p>
     {% endif %}
+  </div>
 
-    </div>
-    <div class="card-footer text-end">
-  <!-- Кнопка для открытия модалки -->
-  <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#changeExecutorModal">
-    Передать на согласование другому руководителю
-  </button>
+  <div class="card-footer d-flex justify-content-end">
+    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#changeExecutorModal">Передать на согласование другому руководителю</button>
+  </div>
 </div>
 
 <!-- Модальное окно -->
@@ -55,16 +52,14 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
         </div>
         <div class="modal-body">
-          <div class="mb-3">
-            <label for="executor" class="form-label">Согласующий</label>
-            <select name="executor" id="executor" class="form-select" required>
-              {% for user in leaders %}
-                  <option value="{{ user.id }}" {% if document.executor.id == user.id %}selected{% endif %}>
-                      {{ user.get_full_name|default:user.username }}
-                  </option>
-              {% endfor %}
-            </select>
-          </div>
+          <label for="executor" class="form-label">Согласующий</label>
+          <select name="executor" id="executor" class="form-select" required>
+            {% for user in leaders %}
+              <option value="{{ user.id }}" {% if document.executor.id == user.id %}selected{% endif %}>
+                {{ user.get_full_name|default:user.username }}
+              </option>
+            {% endfor %}
+          </select>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
@@ -74,19 +69,17 @@
     </div>
   </div>
 </div>
-  </div>
 
-  <div class="card">
-    <div class="card-body">
-      <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <div class="text-end mt-3">
-          <button type="submit" class="btn btn-success">Сохранить</button>
-          <a href="{% url 'documents_for_review' %}" class="btn btn-outline-secondary">Назад</a>
-        </div>
-      </form>
-    </div>
+<div class="card">
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <a href="{% url 'documents_for_review' %}" class="btn btn-outline-secondary">Назад</a>
+        <button type="submit" class="btn btn-success">Сохранить</button>
+      </div>
+    </form>
   </div>
 </div>
 {% endblock %}

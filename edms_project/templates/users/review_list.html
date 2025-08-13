@@ -1,59 +1,56 @@
 {% extends 'base.html' %}
+{% block title %}{% if request.user.groups.all.0.name == 'Сотрудник' %}Документы на доработке{% else %}Документы на согласование{% endif %} — ЭДО{% endblock %}
 {% block content %}
-
-<div class="container py-5">
-    {% if request.user.groups.all.0.name == 'Сотрудник' %}
-    <h2 class="mb-4">Документы на доработке</h2>
-    {% else %}
-    <h2 class="mb-4">Документы на согласование</h2>
-    {% endif %}
-
-    {% if documents %}
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>№</th>
-                        <th>Краткое содержание</th>
-                        <th>Тип</th>
-                        <th>Файл</th>
-                        <th>Статус</th>
-                        <th>Адресат/Автор</th>
-                        <th>Согласующий</th>
-                        <th>Создан</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for doc in documents %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ doc.title }}</td>
-                            <td>{{ doc.type_choices }}</td>
-                            <td>
-                                {% if doc.file %}
-                                    <a href="{{ doc.file.url }}" target="_blank" download>{{ doc.file.name|truncatechars:30 }}</a>
-                                {% else %}
-                                    —
-                                {% endif %}
-                            </td>
-                            <td>{{ doc.get_status_display }}</td>
-                            <td>{{ doc.creator.get_full_name|default:doc.creator.username }}</td>
-                            <td>{{ doc.executor.get_full_name|default:doc.executor.username }}</td>
-                            <td>{{ doc.created_at|date:"d.m.Y H:i" }}</td>
-                            <td>
-                                <a href="{% url 'review_document' doc.id %}" class="btn btn-sm btn-primary">
-                                    Открыть
-                                </a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <div class="alert alert-info">Нет документов, ожидающих согласования.</div>
-    {% endif %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  {% if request.user.groups.all.0.name == 'Сотрудник' %}
+  <h2 class="mb-0">Документы на доработке</h2>
+  {% else %}
+  <h2 class="mb-0">Документы на согласование</h2>
+  {% endif %}
 </div>
 
+{% if documents %}
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>№</th>
+              <th>Краткое содержание</th>
+              <th>Тип</th>
+              <th>Файл</th>
+              <th>Статус</th>
+              <th>Адресат/Автор</th>
+              <th>Согласующий</th>
+              <th>Создан</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doc in documents %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ doc.title }}</td>
+                <td>{{ doc.type_choices }}</td>
+                <td>
+                  {% if doc.file %}
+                    <a href="{{ doc.file.url }}" target="_blank" download>{{ doc.file.name|truncatechars:30 }}</a>
+                  {% else %}—{% endif %}
+                </td>
+                <td><span class="badge bg-secondary">{{ doc.get_status_display }}</span></td>
+                <td>{{ doc.creator.get_full_name|default:doc.creator.username }}</td>
+                <td>{{ doc.executor.get_full_name|default:doc.executor.username }}</td>
+                <td class="text-nowrap">{{ doc.created_at|date:"d.m.Y H:i" }}</td>
+                <td class="text-end"><a href="{% url 'review_document' doc.id %}" class="btn btn-sm btn-primary">Открыть</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div class="alert alert-info">Нет документов, ожидающих согласования.</div>
+{% endif %}
 {% endblock %}

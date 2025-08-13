@@ -1,12 +1,17 @@
 {% extends 'base.html' %}
+{% block title %}Редактировать поручение — ЭДО{% endblock %}
 {% block content %}
-<div class="container py-5">
-    <h2>Редактировать поручение: {{ task.title }}</h2>
+<h2 class="mb-4">Редактировать поручение: {{ task.title }}</h2>
+<div class="card">
+  <div class="card-body">
     <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'task_list' %}" class="btn btn-outline-secondary">Назад</a>
         <button type="submit" class="btn btn-success">Сохранить</button>
-        <a href="{% url 'task_list' %}" class="btn btn-secondary">Назад</a>
+      </div>
     </form>
+  </div>
 </div>
 {% endblock %}

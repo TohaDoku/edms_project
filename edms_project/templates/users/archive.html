@@ -1,46 +1,44 @@
 {% extends 'base.html' %}
+{% block title %}Архив документов — ЭДО{% endblock %}
 {% block content %}
-<div class="container py-4">
-  <h2 class="mb-4">Архив документов</h2>
+<h2 class="mb-4">Архив документов</h2>
 
-  {% if documents %}
-    <div class="table-responsive">
-      <table class="table table-bordered table-hover align-middle">
-        <thead class="table-light">
-          <tr>
-            <th>№</th>
-            <th>Краткое содержание</th>
-            
-            <th>Файл</th>
-            <th>Статус</th>
-            <th>Дата</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for doc in documents %}
+{% if documents %}
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>№</th>
+              <th>Краткое содержание</th>
+              <th>Файл</th>
+              <th>Статус</th>
+              <th>Дата</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doc in documents %}
             <tr>
               <td>{{ forloop.counter }}</td>
               <td>{{ doc.title }}</td>
               <td>
                 {% if doc.file %}
                   <a href="{{ doc.file.url }}" target="_blank" download>Скачать</a>
-                {% else %}
-                  —
-                {% endif %}
+                {% else %}—{% endif %}
               </td>
               <td><span class="badge bg-secondary">{{ doc.get_status_display }}</span></td>
-              <td>{{ doc.created_at|date:"d.m.Y H:i" }}</td>
-              <td>
-                <a href="{% url 'document_detail' doc.id %}" class="btn btn-sm btn-primary">Открыть</a>
-              </td>
+              <td class="text-nowrap">{{ doc.created_at|date:"d.m.Y H:i" }}</td>
+              <td class="text-end"><a href="{% url 'document_detail' doc.id %}" class="btn btn-sm btn-primary">Открыть</a></td>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
-  {% else %}
-    <div class="alert alert-info">Документы в архиве отсутствуют.</div>
-  {% endif %}
-</div>
+  </div>
+{% else %}
+  <div class="alert alert-info">Документы в архиве отсутствуют.</div>
+{% endif %}
 {% endblock %}

@@ -32,7 +32,7 @@ class Task(models.Model):
     description = models.TextField("Описание", blank=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_tasks")
     executor = models.ForeignKey(User, on_delete=models.CASCADE, related_name="assigned_tasks")
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, blank=True, null=True)
     deadline = models.DateTimeField("Дедлайн")
     created_at = models.DateTimeField(auto_now_add=True)
     is_completed = models.BooleanField(default=False)
