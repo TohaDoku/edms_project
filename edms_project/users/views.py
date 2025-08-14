@@ -284,3 +284,13 @@ def edit_task(request, task_id):
         form = TaskForm(instance=task)
 
     return render(request, 'users/edit_task.html', {'form': form, 'task': task})
+
+
+def is_not_employee(user):
+    return not user.groups.filter(name='Сотрудник').exists()
+
+@login_required
+@user_passes_test(is_not_employee)
+def all_tasks_list(request):
+    tasks = Task.objects.filter(deadline__gte=timezone.now()).order_by('is_completed', 'deadline')
+    return render(request, 'users/all_tasks_list.html', {'tasks': tasks})

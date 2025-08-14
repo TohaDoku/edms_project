@@ -61,6 +61,7 @@
             <ul class="dropdown-menu">
               {% if not request.user.groups.all.0.name == 'Сотрудник' %}
               <li><a class="dropdown-item" href="{% url 'create_task' %}">Создать поручение</a></li>
+              <li><a class="dropdown-item" href="{% url 'all_tasks_list' %}">Поручения сотрудников</a></li>
               {% endif %}
               <li><a class="dropdown-item" href="{% url 'task_list' %}">Активные поручения</a></li>
             </ul>
