@@ -3,6 +3,13 @@ from .models import *
 from django.contrib.auth.models import User, Group
 
 class TaskForm(forms.ModelForm):
+    executor = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Исполнитель",
+        to_field_name="id"
+    )
+
     class Meta:
         model = Task
         fields = ['title', 'description', 'executor', 'deadline']
@@ -16,14 +23,16 @@ class TaskForm(forms.ModelForm):
                 'placeholder': 'Описание поручения',
                 'rows': 4
             }),
-            'executor': forms.Select(attrs={
-                'class': 'form-select'
-            }),
             'deadline': forms.DateTimeInput(attrs={
                 'type': 'datetime-local',
                 'class': 'form-control'
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Сделаем подписи вида "Имя Фамилия"
+        self.fields['executor'].label_from_instance = lambda obj: f"{obj.last_name} {obj.first_name}".strip() or obj.username
 
 
 class DocumentReviewForm(forms.ModelForm):

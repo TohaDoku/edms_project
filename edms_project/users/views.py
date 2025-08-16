@@ -261,7 +261,7 @@ def change_document_executor(request, document_id):
 
 @login_required
 def complete_task(request, task_id):
-    task = get_object_or_404(Task, id=task_id, executor=request.user)
+    task = get_object_or_404(Task, id=task_id)
     task.is_completed = True
     task.save()
     return redirect('task_list')

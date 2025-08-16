@@ -19,8 +19,10 @@
           <div class="small mb-2">Кто выполняет: <strong>{{ task.executor }}</strong></div>
           <p class="card-text flex-grow-1">{{ task.description }}</p>
           <div class="d-flex gap-2">
+            {% if not request.user.groups.all.0.name == 'Сотрудник' %}
             <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-outline-primary btn-icon">✏ <span>Изменить</span></a>
             <a href="{% url 'complete_task' task.id %}" class="btn btn-sm btn-success btn-icon" onclick="return confirm('Отметить как выполнено?')">✔ <span>Выполнено</span></a>
+            {% endif %}
           </div>
         </div>
       </div>
